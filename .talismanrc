@@ -1,0 +1,14 @@
+fileignoreconfig:
+- filename: src/main/resources/db/migration/V1.0__CreateAccountTable.sql
+  checksum: 47df80755902308c7eaae2e4248d46611da6a3d0a191d9d543b9db52ce7df9fb
+- filename: src/main/resources/db/migration/V1.1__CreateTransactionTypeTable.sql
+  checksum: ede50149235c6ab092be993b864e99852b0f640b08330678be71934dbc2ac758
+- filename: src/main/resources/db/migration/V1.2__CreateTransactionTable.sql
+  checksum: be0708e86fca084e1c74fee2f3fa79edcdc5cb1219894d3cc7220a3dc4fd8434
+- filename: src/main/resources/db/migration/V1.1__CreateTransactionTypeTable.sql
+  checksum: a1353f7bde2ea887bbf84c71c5100486a1b0b1421c5aad7e9adb00f8ec138701
+- filename: src/main/resources/db/migration/V1.2__CreateTransactionTable.sql
+  checksum: d0f98405d756cc688fcaf9df9760ba35cfce7bd9547fad2160a6ec156881058b
+- filename: src/main/resources/db/migration/V1.0__CreateAccountTable.sql
+  checksum: 1f99ab71ec9899343c837d27ddbcfac90a844a4760795bda2b1d1e8aefc8e531
+version: ""

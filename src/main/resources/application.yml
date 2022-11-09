@@ -1,0 +1,14 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bank
+    username: tweats
+    password: tweats
+logging:
+  level:
+    root: INFO
+server:
+  servlet:
+    context-path: /bank/api/v1
