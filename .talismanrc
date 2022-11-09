@@ -1,4 +1,10 @@
 fileignoreconfig:
+- filename: src/main/java/com/bank/model/Account.java
+  checksum: e515ec55010029131982aa83abe3aa0bc532aeb9659027adcb6490925ac44c06
+- filename: src/test/java/com/bank/service/AccountServiceTest.java
+  checksum: 3181ebc6b41d85e521de2caa92fb77d99d3cfbb912edc5a7e6ca7ae4db2472ab
+- filename: src/test/java/com/bank/controller/AccountControllerTest.java
+  checksum: 419a641cd2fee3982f0c39ee2a6f8a7f937c5b94503a460b346a0ae22fa0bbef
 - filename: src/main/resources/db/migration/V1.0__CreateAccountTable.sql
   checksum: 47df80755902308c7eaae2e4248d46611da6a3d0a191d9d543b9db52ce7df9fb
 - filename: src/main/resources/db/migration/V1.1__CreateTransactionTypeTable.sql
