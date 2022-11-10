@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 @Service
 public class TransactionService {
-    public void credit(BigDecimal amount) {
+    public void credit(String accountId, BigDecimal amount) {
 
     }
 }

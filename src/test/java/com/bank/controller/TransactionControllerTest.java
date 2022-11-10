@@ -6,9 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class TransactionControllerTest {
 
@@ -24,11 +24,14 @@ public class TransactionControllerTest {
 
     @Test
     void shouldBeAbleToCreditAmountInTheAccount() {
+        String accountId = "userAccount";
         BigDecimal amount = new BigDecimal(100);
         TransactionRequest transactionRequest = new TransactionRequest(amount);
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn(accountId);
 
-        transactionController.credit(transactionRequest);
+        transactionController.credit(principal,transactionRequest);
 
-        verify(transactionService).credit(transactionRequest.getAmount());
+        verify(transactionService).credit(accountId,transactionRequest.getAmount());
     }
 }
