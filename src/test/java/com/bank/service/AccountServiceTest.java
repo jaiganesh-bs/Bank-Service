@@ -24,8 +24,8 @@ public class AccountServiceTest {
         String id = "example@123";
         String name = "Jaiganesh";
         String password = "Password@234";
-        Account account = new Account(id, name, password);
-        when(accountRepository.save(any())).thenReturn(account);
+        Account account = new Account(name, password);
+        when(accountRepository.save(account)).thenReturn(account);
 
         Account actualAccount = accountService.create(name, password);
 

@@ -49,10 +49,4 @@ public class Account {
         this.avail_bal = new BigDecimal(0);
     }
 
-    public Account(String id, String name, String password) {
-        this.id = id;
-        this.name = name;
-        this.password = password;
-        this.avail_bal = new BigDecimal(0);
-    }
 }
