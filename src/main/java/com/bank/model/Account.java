@@ -2,17 +2,22 @@ package com.bank.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Objects;
-
+@Entity
+@Table(name = "account")
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class Account {
     @Id
     @GeneratedValue(generator = "uuid")
@@ -41,11 +46,13 @@ public class Account {
     public Account(String name, String password) {
         this.name = name;
         this.password = password;
+        this.avail_bal = new BigDecimal(0);
     }
 
     public Account(String id, String name, String password) {
         this.id = id;
         this.name = name;
         this.password = password;
+        this.avail_bal = new BigDecimal(0);
     }
 }

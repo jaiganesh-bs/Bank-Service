@@ -21,9 +21,10 @@ public class AccountControllerTest {
         AccountController accountController = new AccountController(accountService);
         String name = "Jaiganesh";
         String password = "Password@234";
-
         CreateAccountRequest createAccountRequest = new CreateAccountRequest(name, password);
+
         accountController.create(createAccountRequest);
+
         verify(accountService).create(createAccountRequest.getName(),createAccountRequest.getPassword());
     }
 }
