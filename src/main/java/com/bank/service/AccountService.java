@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -19,14 +20,15 @@ public class AccountService implements UserDetailsService {
     private final AccountRepository accountRepository;
 
     public Account create(String name, String password) {
-        Account account = new Account(name, password);
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        Account account = new Account(name, bCryptPasswordEncoder.encode(password));
         Account userAccount = accountRepository.save(account);
         return userAccount;
     }
 
     public Account getAccount(String id) throws AccountNotFoundException {
         Optional<Account> optionalAccount = accountRepository.findById(id);
-        if(optionalAccount.isPresent()){
+        if (optionalAccount.isPresent()) {
             return optionalAccount.get();
         }
         throw new AccountNotFoundException();

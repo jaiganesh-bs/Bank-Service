@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Objects;
+
 @Entity
 @Table(name = "account")
 @Getter
@@ -21,7 +22,7 @@ import java.util.Objects;
 public class Account {
     @Id
     @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid",strategy = "uuid2")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String id;
 
     private String name;
@@ -29,6 +30,12 @@ public class Account {
     private String password;
 
     private BigDecimal avail_bal;
+
+    public Account(String name, String password) {
+        this.name = name;
+        this.password = password;
+        this.avail_bal = new BigDecimal(0);
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -43,10 +50,5 @@ public class Account {
         return Objects.hash(id);
     }
 
-    public Account(String name, String password) {
-        this.name = name;
-        this.password = password;
-        this.avail_bal = new BigDecimal(0);
-    }
 
 }

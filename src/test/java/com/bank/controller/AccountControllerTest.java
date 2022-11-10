@@ -18,10 +18,11 @@ public class AccountControllerTest {
     private AccountController accountController;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         accountService = mock(AccountService.class);
         accountController = new AccountController(accountService);
     }
+
     @Test
     void shouldBeAbleToCreateAccountWithValidNameAndPassword() {
         String name = "Jaiganesh";
@@ -31,7 +32,7 @@ public class AccountControllerTest {
 
         accountController.create(createAccountRequest);
 
-        verify(accountService).create(createAccountRequest.getName(),createAccountRequest.getPassword());
+        verify(accountService).create(createAccountRequest.getName(), createAccountRequest.getPassword());
     }
 
     @Test

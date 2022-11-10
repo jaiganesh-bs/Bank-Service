@@ -17,16 +17,18 @@ import java.security.Principal;
 @AllArgsConstructor
 public class AccountController {
     private final AccountService accountService;
+
     @PostMapping
     public ResponseEntity create(@RequestBody CreateAccountRequest createAccountRequest) {
         Account account = accountService.create(createAccountRequest.getName(), createAccountRequest.getPassword());
         return new ResponseEntity<>(account.getId(), HttpStatus.CREATED);
 
     }
-    @GetMapping("/summary")
+
+    @GetMapping("summary")
     public ResponseEntity summary(Principal principal) throws AccountNotFoundException {
         Account account = accountService.getAccount(principal.getName());
         SummaryResponse summaryResponse = new SummaryResponse(account.getId(), account.getName(), account.getAvail_bal());
-        return new ResponseEntity<>(summaryResponse,HttpStatus.OK);
+        return new ResponseEntity<>(summaryResponse, HttpStatus.OK);
     }
 }

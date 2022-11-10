@@ -41,12 +41,12 @@ public class AccountControllerIntegrationTest {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @BeforeEach
-    public void before(){
+    public void before() {
         accountRepository.deleteAll();
     }
 
     @AfterEach
-    public void after(){
+    public void after() {
         accountRepository.deleteAll();
     }
 
