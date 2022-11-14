@@ -51,4 +51,7 @@ public class Account {
     }
 
 
+    public void credit(BigDecimal amount) {
+        this.avail_bal = avail_bal.add(amount);
+    }
 }

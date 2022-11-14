@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -43,5 +44,11 @@ public class AccountService implements UserDetailsService {
             throw new UsernameNotFoundException(e.getMessage());
         }
 
+    }
+
+    public Account credit(String id, BigDecimal amount) throws AccountNotFoundException {
+        Account account = getAccount(id);
+        account.credit(amount);
+        return account;
     }
 }
