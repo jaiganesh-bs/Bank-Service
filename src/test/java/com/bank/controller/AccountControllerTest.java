@@ -15,10 +15,13 @@ public class AccountControllerTest {
 
     private AccountService accountService;
     private AccountController accountController;
+    private Principal principal;
+
 
     @BeforeEach
     public void setUp() {
         accountService = mock(AccountService.class);
+        principal = mock(Principal.class);
         accountController = new AccountController(accountService);
     }
 
@@ -37,7 +40,6 @@ public class AccountControllerTest {
     @Test
     void shouldBeAbleToGetAccountSummary() throws AccountNotFoundException {
         String id = "accountUser";
-        Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn(id);
         when(accountService.getAccount(id)).thenReturn(new Account());
 

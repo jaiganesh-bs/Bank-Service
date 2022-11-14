@@ -134,7 +134,7 @@ public class TransactionServiceTest {
         }
         TransactionHistoryResponse transactionHistoryResponse = new TransactionHistoryResponse(id, name, transactionResponse, balance);
 
-        TransactionHistoryResponse actualTransactionHistoryResponse = transactionService.getTransactionHistory(id);
+        TransactionHistoryResponse actualTransactionHistoryResponse = transactionService.getAccountStatement(id);
 
         assertThat(transactionHistoryResponse, is(equalTo(actualTransactionHistoryResponse)));
     }

@@ -8,9 +8,7 @@ import com.bank.model.Transaction;
 import com.bank.service.TransactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -33,8 +31,8 @@ public class TransactionController {
         return new ResponseEntity(debit.getId(),HttpStatus.CREATED);
     }
     @GetMapping
-    public ResponseEntity transactionHistory(Principal principal) throws AccountNotFoundException {
-        TransactionHistoryResponse transactionHistory = transactionService.getTransactionHistory(principal.getName());
+    public ResponseEntity accountStatement(Principal principal) throws AccountNotFoundException {
+        TransactionHistoryResponse transactionHistory = transactionService.getAccountStatement(principal.getName());
         return new ResponseEntity(transactionHistory, HttpStatus.OK);
     }
 }

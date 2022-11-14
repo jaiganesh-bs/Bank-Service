@@ -11,7 +11,6 @@ import com.bank.repo.TransactionTypeRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -58,7 +57,7 @@ public class TransactionService {
         return  transactions;
     }
 
-    public TransactionHistoryResponse getTransactionHistory(String id) throws AccountNotFoundException {
+    public TransactionHistoryResponse getAccountStatement(String id) throws AccountNotFoundException {
         List<Transaction> transactions = getHistory(id);
         Account account = accountService.getAccount(id);
         List<TransactionResponse> transactionResponse = new ArrayList<>();
