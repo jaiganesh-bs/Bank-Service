@@ -95,6 +95,35 @@ public class TransactionControllerIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void shouldBeAbleToDebitAmountInAccount() throws Exception {
+        String name = "Jaiganesh";
+        String password = "Password@234";
+        Account account = new Account(name, bCryptPasswordEncoder.encode(password));
+        Account userAccount = accountRepository.save(account);
+        TransactionRequest transactionRequest = new TransactionRequest(new BigDecimal(100));
+        transactionTypeRepository.save(new TransactionType("DEBIT"));
 
+        mockMvc.perform(post("/transaction/debit").with(httpBasic(userAccount.getId(),password))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(transactionRequest)))
+                .andExpect(status().isCreated());
+
+    }
+
+    @Test
+    void shouldThrowErrorWhenAmountToBeDebitedIsLessThanOne() throws Exception {
+        String name = "Jaiganesh";
+        String password = "Password@234";
+        Account account = new Account(name, bCryptPasswordEncoder.encode(password));
+        Account userAccount = accountRepository.save(account);
+        TransactionRequest transactionRequest = new TransactionRequest(new BigDecimal(0));
+        transactionTypeRepository.save(new TransactionType("DEBIT"));
+
+        mockMvc.perform(post("/transaction/debit").with(httpBasic(userAccount.getId(),password))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(transactionRequest)))
+                .andExpect(status().isBadRequest());
+    }
 
 }
