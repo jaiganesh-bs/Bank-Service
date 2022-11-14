@@ -5,7 +5,6 @@ import com.bank.model.Account;
 import com.bank.model.UserAccount;
 import com.bank.repo.AccountRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

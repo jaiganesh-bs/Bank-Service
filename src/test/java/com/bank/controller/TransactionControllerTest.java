@@ -3,6 +3,7 @@ package com.bank.controller;
 import com.bank.controller.request.TransactionRequest;
 import com.bank.exceptions.AccountNotFoundException;
 import com.bank.exceptions.InvalidAmountException;
+import com.bank.model.Transaction;
 import com.bank.service.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ public class TransactionControllerTest {
         TransactionRequest transactionRequest = new TransactionRequest(amount);
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn(accountId);
+        when(transactionService.credit(principal.getName(),amount)).thenReturn(mock(Transaction.class));
 
         transactionController.credit(principal,transactionRequest);
 

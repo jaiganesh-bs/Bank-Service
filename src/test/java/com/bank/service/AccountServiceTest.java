@@ -5,9 +5,9 @@ import com.bank.model.Account;
 import com.bank.repo.AccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -60,5 +60,19 @@ public class AccountServiceTest {
 
         assertThrows(AccountNotFoundException.class, () -> accountService.getAccount(id));
 
+    }
+
+    @Test
+    void shouldReturnTenAsAvailableBalanceWhenTenRupeesIsCreditedToAccount() throws AccountNotFoundException {
+        BigDecimal ten = new BigDecimal(10);
+        String id = "userAccount";
+        String name = "Jaiganesh";
+        String password = "Password@234";
+        Account userAccount = new Account(name, password);
+        when(accountRepository.findById(id)).thenReturn(Optional.of(userAccount));
+
+        Account account = accountService.credit(id, ten);
+
+        assertThat(ten,is(equalTo(account.getAvail_bal())));
     }
 }

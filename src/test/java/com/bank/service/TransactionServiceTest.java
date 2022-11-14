@@ -11,11 +11,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class TransactionServiceTest {
@@ -37,6 +35,8 @@ public class TransactionServiceTest {
     void shouldBeAbleToGetTheAccountAfterCreditedTheAmount() throws AccountNotFoundException, InvalidAmountException {
         String id = "userId";
         BigDecimal amount = new BigDecimal(100);
+        when(transactionTypeRepository.findByName("CREDIT")).thenReturn(new TransactionType("CREDIT"));
+        when(accountService.credit(id,amount)).thenReturn(mock(Account.class));
 
         transactionService.credit(id, amount);
 

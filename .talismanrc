@@ -1,4 +1,8 @@
 fileignoreconfig:
+- filename: src/test/java/com/bank/service/AccountServiceTest.java
+  checksum: df896d7154cd35f2c1e4bf53a19cbd0fd706f4328a5c46f403958a60ba0c0dcb
+- filename: src/test/java/com/bank/view/TransactionControllerIntegrationTest.java
+  checksum: 64e607c4ec5c1e5f2d0be0f70e4b35f8cdea4aa972c9a556fd63503609e9139c
 - filename: src/main/java/com/bank/service/AccountService.java
   checksum: e7f8c30dec36241815f325d4efca91f4d14f4c6cefa3db7ecb75628b499327c0
 - filename: src/test/java/com/bank/service/AccountServiceTest.java

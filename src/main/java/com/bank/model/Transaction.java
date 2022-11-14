@@ -20,17 +20,17 @@ import java.util.Objects;
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     @OneToOne
-    @Column(name = "account_id")
+    @JoinColumn(name = "account_id")
     private Account account;
 
-
+    @Temporal(TemporalType.DATE)
     private Date date;
 
     @OneToOne
-    @Column(name = "transaction_type_id")
+    @JoinColumn(name = "transaction_type_id")
     private TransactionType transactionType;
 
     private BigDecimal amount;

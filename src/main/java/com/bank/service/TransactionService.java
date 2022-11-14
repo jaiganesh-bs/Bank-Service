@@ -8,27 +8,28 @@ import com.bank.repo.TransactionRepository;
 import com.bank.repo.TransactionTypeRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Service
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Service
 public class TransactionService {
-
+    @Autowired
     private TransactionRepository transactionRepository;
-
+    @Autowired
     private AccountService accountService;
-
+    @Autowired
     private TransactionTypeRepository transactionTypeRepository;
 
-    public void credit(String accountId, BigDecimal amount) throws AccountNotFoundException, InvalidAmountException {
+    public Transaction credit(String accountId, BigDecimal amount) throws AccountNotFoundException, InvalidAmountException {
         if(isValidAmount(amount)) throw new InvalidAmountException();
         Account account = accountService.credit(accountId, amount);
         Transaction credit = new Transaction(account, getToday(), transactionTypeRepository.findByName("CREDIT"), amount, account.getAvail_bal());
-        transactionRepository.save(credit);
+        return transactionRepository.save(credit);
     }
 
     private boolean isValidAmount(BigDecimal amount) {
