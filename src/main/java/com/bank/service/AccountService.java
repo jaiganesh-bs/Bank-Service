@@ -50,4 +50,8 @@ public class AccountService implements UserDetailsService {
         account.credit(amount);
         return account;
     }
+
+    public Account debit(String id, BigDecimal amount) {
+        return null;
+    }
 }

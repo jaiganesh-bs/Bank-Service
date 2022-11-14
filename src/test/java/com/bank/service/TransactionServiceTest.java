@@ -65,4 +65,39 @@ public class TransactionServiceTest {
 
         assertThrows(InvalidAmountException.class, () -> transactionService.credit(id, amount));
     }
+
+    @Test
+    void shouldBeAbleToGetAccountAfterTheAmountIsDebited() throws InvalidAmountException {
+        String id = "userId";
+        BigDecimal amount = new BigDecimal(100);
+        when(transactionTypeRepository.findByName("DEBIT")).thenReturn(new TransactionType("DEBIT"));
+        when(accountService.debit(id,amount)).thenReturn(mock(Account.class));
+
+        transactionService.debit(id, amount);
+
+        verify(accountService).debit(id, amount);
+    }
+
+    @Test
+    void shouldBeAbleToAddTheTransactionToTheAccountWhenDebitIsDone() throws InvalidAmountException {
+        String accountId = "userId";
+        BigDecimal amount = new BigDecimal(100);
+        when(transactionTypeRepository.findByName("DEBIT")).thenReturn(new TransactionType("DEBIT"));
+        Account account = mock(Account.class);
+        when(accountService.debit(accountId, amount)).thenReturn(account);
+        Date today = new Date();
+        Transaction debit = new Transaction(account, today, transactionTypeRepository.findByName("CREDIT"), amount, account.getAvail_bal());
+
+        transactionService.debit(accountId, amount);
+
+        verify(transactionRepository).save(debit);
+    }
+
+    @Test
+    void shouldThrowAmountNotBeLessThanOneExceptionWhenDebitAmountIsLessThanOne() {
+        String id = "userId";
+        BigDecimal amount = new BigDecimal(-1);
+
+        assertThrows(InvalidAmountException.class, () -> transactionService.debit(id, amount));
+    }
 }
