@@ -40,7 +40,7 @@ public class TransactionControllerTest {
     }
 
     @Test
-    void shouldBeAbleToDebitAmountInTheAccount() throws InvalidAmountException {
+    void shouldBeAbleToDebitAmountInTheAccount() throws InvalidAmountException, AccountNotFoundException {
         String accountId = "userAccount";
         BigDecimal amount = new BigDecimal(100);
         TransactionRequest transactionRequest = new TransactionRequest(amount);

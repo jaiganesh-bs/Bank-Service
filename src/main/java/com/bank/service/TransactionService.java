@@ -40,7 +40,7 @@ public class TransactionService {
         return new Date();
     }
 
-    public Transaction debit(String accountId, BigDecimal amount) throws InvalidAmountException {
+    public Transaction debit(String accountId, BigDecimal amount) throws InvalidAmountException, AccountNotFoundException {
         if(isValidAmount(amount)) throw new InvalidAmountException();
         Account account = accountService.debit(accountId, amount);
         Transaction debit = new Transaction(account, getToday(), transactionTypeRepository.findByName("DEBIT"), amount, account.getAvail_bal());

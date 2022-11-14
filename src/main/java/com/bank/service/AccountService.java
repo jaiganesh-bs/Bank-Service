@@ -51,7 +51,9 @@ public class AccountService implements UserDetailsService {
         return account;
     }
 
-    public Account debit(String id, BigDecimal amount) {
-        return null;
+    public Account debit(String id, BigDecimal amount) throws AccountNotFoundException {
+        Account account = getAccount(id);
+        account.debit(amount);
+        return account;
     }
 }

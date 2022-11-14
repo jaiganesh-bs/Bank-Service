@@ -73,6 +73,20 @@ public class AccountServiceTest {
 
         Account account = accountService.credit(id, ten);
 
-        assertThat(ten,is(equalTo(account.getAvail_bal())));
+        assertThat(ten, is(equalTo(account.getAvail_bal())));
+    }
+
+    @Test
+    void shouldReturnTenAsAvailableBalanceWhenTenRupeesIsDebitedFromAccount() throws AccountNotFoundException {
+        BigDecimal ten = new BigDecimal(10);
+        String id = "userAccount";
+        String name = "Jaiganesh";
+        String password = "Password@234";
+        Account userAccount = new Account(id, name, password, new BigDecimal(20));
+        when(accountRepository.findById(id)).thenReturn(Optional.of(userAccount));
+
+        Account account = accountService.debit(id, ten);
+
+        assertThat(ten, is(equalTo(account.getAvail_bal())));
     }
 }

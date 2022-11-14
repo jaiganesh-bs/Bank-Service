@@ -27,7 +27,7 @@ public class TransactionController {
         return new ResponseEntity(credit.getId(),HttpStatus.CREATED);
     }
 
-    public void debit(Principal principal, TransactionRequest transactionRequest) throws InvalidAmountException {
+    public void debit(Principal principal, TransactionRequest transactionRequest) throws InvalidAmountException, AccountNotFoundException {
         transactionService.debit(principal.getName(), transactionRequest.getAmount());
     }
 }

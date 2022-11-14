@@ -67,7 +67,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    void shouldBeAbleToGetAccountAfterTheAmountIsDebited() throws InvalidAmountException {
+    void shouldBeAbleToGetAccountAfterTheAmountIsDebited() throws InvalidAmountException, AccountNotFoundException {
         String id = "userId";
         BigDecimal amount = new BigDecimal(100);
         when(transactionTypeRepository.findByName("DEBIT")).thenReturn(new TransactionType("DEBIT"));
@@ -79,7 +79,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    void shouldBeAbleToAddTheTransactionToTheAccountWhenDebitIsDone() throws InvalidAmountException {
+    void shouldBeAbleToAddTheTransactionToTheAccountWhenDebitIsDone() throws InvalidAmountException, AccountNotFoundException {
         String accountId = "userId";
         BigDecimal amount = new BigDecimal(100);
         when(transactionTypeRepository.findByName("DEBIT")).thenReturn(new TransactionType("DEBIT"));
