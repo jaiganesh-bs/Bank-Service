@@ -56,4 +56,8 @@ public class AccountService implements UserDetailsService {
         account.debit(amount);
         return account;
     }
+
+    public void getTransactionHistory(String id) {
+
+    }
 }

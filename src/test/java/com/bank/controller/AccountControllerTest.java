@@ -3,7 +3,6 @@ package com.bank.controller;
 import com.bank.controller.request.CreateAccountRequest;
 import com.bank.exceptions.AccountNotFoundException;
 import com.bank.model.Account;
-import com.bank.model.UserAccount;
 import com.bank.service.AccountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +35,7 @@ public class AccountControllerTest {
     }
 
     @Test
-    void shouldBeAbleToGetAccountSummaryWhenAccountIdIsGiven() throws AccountNotFoundException {
+    void shouldBeAbleToGetAccountSummary() throws AccountNotFoundException {
         String id = "accountUser";
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn(id);
@@ -45,5 +44,17 @@ public class AccountControllerTest {
         accountController.summary(principal);
 
         verify(accountService).getAccount(id);
+    }
+
+    @Test
+    void shouldBeAbleToGetAccountTransactionHistory() throws AccountNotFoundException {
+        String id = "accountUser";
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn(id);
+        when(accountService.getAccount(id)).thenReturn(new Account());
+
+        accountController.transactionHistory(principal);
+
+        verify(accountService).getTransactionHistory(id);
     }
 }

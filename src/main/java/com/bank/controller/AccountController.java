@@ -31,4 +31,8 @@ public class AccountController {
         SummaryResponse summaryResponse = new SummaryResponse(account.getId(), account.getName(), account.getAvail_bal());
         return new ResponseEntity<>(summaryResponse, HttpStatus.OK);
     }
+
+    public void transactionHistory(Principal principal) {
+        accountService.getTransactionHistory(principal.getName());
+    }
 }
