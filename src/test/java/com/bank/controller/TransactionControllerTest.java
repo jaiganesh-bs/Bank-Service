@@ -2,6 +2,7 @@ package com.bank.controller;
 
 import com.bank.controller.request.TransactionRequest;
 import com.bank.exceptions.AccountNotFoundException;
+import com.bank.exceptions.InvalidAmountException;
 import com.bank.service.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ public class TransactionControllerTest {
     }
 
     @Test
-    void shouldBeAbleToCreditAmountInTheAccount() throws AccountNotFoundException {
+    void shouldBeAbleToCreditAmountInTheAccount() throws AccountNotFoundException, InvalidAmountException {
         String accountId = "userAccount";
         BigDecimal amount = new BigDecimal(100);
         TransactionRequest transactionRequest = new TransactionRequest(amount);
