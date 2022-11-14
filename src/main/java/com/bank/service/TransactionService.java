@@ -39,4 +39,8 @@ public class TransactionService {
     private Date getToday() {
         return new Date();
     }
+
+    public Transaction debit(String name, BigDecimal amount) {
+        return null;
+    }
 }

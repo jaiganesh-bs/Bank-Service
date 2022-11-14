@@ -38,4 +38,18 @@ public class TransactionControllerTest {
 
         verify(transactionService).credit(accountId,transactionRequest.getAmount());
     }
+
+    @Test
+    void shouldBeAbleToDebitAmountInTheAccount() {
+        String accountId = "userAccount";
+        BigDecimal amount = new BigDecimal(100);
+        TransactionRequest transactionRequest = new TransactionRequest(amount);
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn(accountId);
+        when(transactionService.debit(principal.getName(),amount)).thenReturn(mock(Transaction.class));
+
+        transactionController.debit(principal,transactionRequest);
+
+        verify(transactionService).debit(accountId,transactionRequest.getAmount());
+    }
 }

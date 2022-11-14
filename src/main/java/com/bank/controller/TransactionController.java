@@ -26,4 +26,8 @@ public class TransactionController {
         Transaction credit = transactionService.credit(principal.getName(), transactionRequest.getAmount());
         return new ResponseEntity(credit.getId(),HttpStatus.CREATED);
     }
+
+    public void debit(Principal principal, TransactionRequest transactionRequest) {
+        transactionService.debit(principal.getName(), transactionRequest.getAmount());
+    }
 }
