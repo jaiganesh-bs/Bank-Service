@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
@@ -33,5 +35,22 @@ public class TransactionResponse {
     @Override
     public int hashCode() {
         return Objects.hash(transactionId);
+    }
+
+    public String getDate() {
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        return dateFormat.format(date);
+    }
+
+    @Override
+    public String toString() {
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        return '{' +
+                "transactionId=" + transactionId +
+                ", date=" + dateFormat.format(date) +
+                ", transactionType='" + transactionType + '\'' +
+                ", amount=" + amount +
+                ", balance=" + balance +
+                '}';
     }
 }

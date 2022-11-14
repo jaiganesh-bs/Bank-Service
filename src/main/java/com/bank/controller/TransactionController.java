@@ -1,6 +1,7 @@
 package com.bank.controller;
 
 import com.bank.controller.request.TransactionRequest;
+import com.bank.controller.response.TransactionHistoryResponse;
 import com.bank.exceptions.AccountNotFoundException;
 import com.bank.exceptions.InvalidAmountException;
 import com.bank.model.Transaction;
@@ -31,7 +32,9 @@ public class TransactionController {
         Transaction debit = transactionService.debit(principal.getName(), transactionRequest.getAmount());
         return new ResponseEntity(debit.getId(),HttpStatus.CREATED);
     }
-    public void transactionHistory(Principal principal) throws AccountNotFoundException {
-        transactionService.getTransactionHistory(principal.getName());
+    @GetMapping
+    public ResponseEntity transactionHistory(Principal principal) throws AccountNotFoundException {
+        TransactionHistoryResponse transactionHistory = transactionService.getTransactionHistory(principal.getName());
+        return new ResponseEntity(transactionHistory, HttpStatus.OK);
     }
 }

@@ -12,9 +12,9 @@ import java.util.Objects;
 @Getter
 @Setter
 public class TransactionHistoryResponse {
-    private String id;
+    private String accountNumber;
     private String name;
-    private List<TransactionResponse> transactionResponse;
+    private List<TransactionResponse> transactions;
     private BigDecimal balance;
 
     @Override
@@ -22,11 +22,21 @@ public class TransactionHistoryResponse {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TransactionHistoryResponse that = (TransactionHistoryResponse) o;
-        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(transactionResponse, that.transactionResponse) && Objects.equals(balance, that.balance);
+        return Objects.equals(accountNumber, that.accountNumber) && Objects.equals(name, that.name) && Objects.equals(transactions, that.transactions) && Objects.equals(balance, that.balance);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, transactionResponse, balance);
+        return Objects.hash(accountNumber, name, transactions, balance);
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "accountNumber='" + accountNumber + '\'' +
+                ", name='" + name + '\'' +
+                ", transactions=" + transactions +
+                ", balance=" + balance +
+                '}';
     }
 }

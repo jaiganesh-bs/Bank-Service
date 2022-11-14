@@ -11,16 +11,16 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SummaryResponse {
-    private String id;
+    private String accountNumber;
     private String name;
     private BigDecimal avail_bal;
 
     @Override
     public String toString() {
         return "{" +
-                "id='" + id + '\'' +
+                "accountNumber='" + accountNumber + '\'' +
                 ", name='" + name + '\'' +
                 ", avail_bal=" + avail_bal +
-                "}";
+                '}';
     }
 }
