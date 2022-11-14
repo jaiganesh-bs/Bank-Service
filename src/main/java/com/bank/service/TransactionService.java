@@ -1,5 +1,7 @@
 package com.bank.service;
 
+import com.bank.controller.response.TransactionHistoryResponse;
+import com.bank.controller.response.TransactionResponse;
 import com.bank.exceptions.AccountNotFoundException;
 import com.bank.exceptions.InvalidAmountException;
 import com.bank.model.Account;
@@ -13,6 +15,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,7 +26,6 @@ public class TransactionService {
 
     @Autowired
     private TransactionRepository transactionRepository;
-    @Lazy
     @Autowired
     private AccountService accountService;
     @Autowired
@@ -54,5 +56,18 @@ public class TransactionService {
     public List<Transaction> getHistory(String accountId) {
         List<Transaction> transactions = transactionRepository.findByAccount_id(accountId);
         return  transactions;
+    }
+
+    public TransactionHistoryResponse getTransactionHistory(String id) throws AccountNotFoundException {
+        List<Transaction> transactions = getHistory(id);
+        Account account = accountService.getAccount(id);
+        List<TransactionResponse> transactionResponse = new ArrayList<>();
+        for (Transaction transaction : transactions) {
+            transactionResponse.add(new TransactionResponse(transaction.getId(),transaction.getDate(), transaction.getTransactionType().getName(), transaction.getAmount(), transaction.getBalance()));
+        }
+        TransactionHistoryResponse transactionHistoryResponse = new TransactionHistoryResponse(account.getId(), account.getName(), transactionResponse, account.getAvail_bal());
+
+
+        return transactionHistoryResponse;
     }
 }

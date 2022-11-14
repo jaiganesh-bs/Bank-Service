@@ -24,8 +24,6 @@ import java.util.Optional;
 public class AccountService implements UserDetailsService {
     private AccountRepository accountRepository;
 
-    private TransactionService transactionService;
-
     public Account create(String name, String password) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         Account account = new Account(name, bCryptPasswordEncoder.encode(password));
@@ -64,16 +62,4 @@ public class AccountService implements UserDetailsService {
         return account;
     }
 
-    public TransactionHistoryResponse getTransactionHistory(String id) throws AccountNotFoundException {
-        List<Transaction> transactions = transactionService.getHistory(id);
-        Account account = getAccount(id);
-        List<TransactionResponse> transactionResponse = new ArrayList<>();
-        for (Transaction transaction : transactions) {
-            transactionResponse.add(new TransactionResponse(transaction.getId(),transaction.getDate(), transaction.getTransactionType().getName(), transaction.getAmount(), transaction.getBalance()));
-        }
-        TransactionHistoryResponse transactionHistoryResponse = new TransactionHistoryResponse(account.getId(), account.getName(), transactionResponse, account.getAvail_bal());
-
-
-        return transactionHistoryResponse;
-    }
 }

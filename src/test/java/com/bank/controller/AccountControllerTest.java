@@ -46,15 +46,5 @@ public class AccountControllerTest {
         verify(accountService).getAccount(id);
     }
 
-    @Test
-    void shouldBeAbleToGetAccountTransactionHistory() throws AccountNotFoundException {
-        String id = "accountUser";
-        Principal principal = mock(Principal.class);
-        when(principal.getName()).thenReturn(id);
-        when(accountService.getAccount(id)).thenReturn(new Account());
 
-        accountController.transactionHistory(principal);
-
-        verify(accountService).getTransactionHistory(id);
-    }
 }

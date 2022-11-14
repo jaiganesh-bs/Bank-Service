@@ -30,9 +30,8 @@ public class AccountServiceTest {
     @BeforeEach
     public void setUp() {
         accountRepository = mock(AccountRepository.class);
-        transactionService = mock(TransactionService.class);
         bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        accountService = new AccountService(accountRepository, transactionService);
+        accountService = new AccountService(accountRepository);
     }
 
     @Test
@@ -96,40 +95,5 @@ public class AccountServiceTest {
         assertThat(ten, is(equalTo(account.getAvail_bal())));
     }
 
-    @Test
-    void shouldAbleToGetAccountTransactionHistoryWhenAccountIdIsGiven() throws AccountNotFoundException {
-        String id = "userAccount";
-        String name = "Jaiganesh";
-        String password = "Password@234";
-        Account account = new Account(name, password);
-        when(accountRepository.findById(id)).thenReturn(Optional.of(account));
 
-        accountService.getTransactionHistory(id);
-
-        verify(transactionService).getHistory(id);
-    }
-
-    @Test
-    void shouldAbleToGetAccountTransactionHistoryAndAvailableBalanceWhenAccountIdIsGiven() throws AccountNotFoundException {
-        String id = "userAccount";
-        String name = "Jaiganesh";
-        String password = "Password@234";
-        BigDecimal balance = new BigDecimal(0);
-        Account account = new Account(id, name, password, balance);
-        when(accountRepository.findById(id)).thenReturn(Optional.of(account));
-        BigDecimal amount = new BigDecimal(100);
-        Transaction credit = new Transaction(account, new Date(), new TransactionType("CREDIT"), amount, amount);
-        Transaction debit = new Transaction(account, new Date(), new TransactionType("DEBIT"), amount, balance);
-        List<Transaction> transactions = new ArrayList<>(Arrays.asList(credit, debit));
-        when(transactionService.getHistory(id)).thenReturn(transactions);
-        ArrayList<TransactionResponse> transactionResponse = new ArrayList<TransactionResponse>();
-        for (Transaction transaction : transactions) {
-            transactionResponse.add(new TransactionResponse(transaction.getId(),transaction.getDate(), transaction.getTransactionType().getName(), transaction.getAmount(), transaction.getBalance()));
-        }
-        TransactionHistoryResponse transactionHistoryResponse = new TransactionHistoryResponse(id, name, transactionResponse, balance);
-
-        TransactionHistoryResponse actualTransactionHistoryResponse = accountService.getTransactionHistory(id);
-
-        assertThat(transactionHistoryResponse, is(equalTo(actualTransactionHistoryResponse)));
-    }
 }

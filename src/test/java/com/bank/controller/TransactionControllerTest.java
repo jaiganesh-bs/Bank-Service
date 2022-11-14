@@ -3,6 +3,7 @@ package com.bank.controller;
 import com.bank.controller.request.TransactionRequest;
 import com.bank.exceptions.AccountNotFoundException;
 import com.bank.exceptions.InvalidAmountException;
+import com.bank.model.Account;
 import com.bank.model.Transaction;
 import com.bank.service.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,5 +52,16 @@ public class TransactionControllerTest {
         transactionController.debit(principal,transactionRequest);
 
         verify(transactionService).debit(accountId,transactionRequest.getAmount());
+    }
+
+    @Test
+    void shouldBeAbleToGetAccountTransactionHistory() throws AccountNotFoundException {
+        String id = "accountUser";
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn(id);
+
+        transactionController.transactionHistory(principal);
+
+        verify(transactionService).getTransactionHistory(id);
     }
 }

@@ -31,4 +31,7 @@ public class TransactionController {
         Transaction debit = transactionService.debit(principal.getName(), transactionRequest.getAmount());
         return new ResponseEntity(debit.getId(),HttpStatus.CREATED);
     }
+    public void transactionHistory(Principal principal) throws AccountNotFoundException {
+        transactionService.getTransactionHistory(principal.getName());
+    }
 }
