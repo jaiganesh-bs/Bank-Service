@@ -9,17 +9,21 @@ import com.bank.repo.TransactionTypeRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Service
 public class TransactionService {
+
     @Autowired
     private TransactionRepository transactionRepository;
+    @Lazy
     @Autowired
     private AccountService accountService;
     @Autowired
@@ -45,5 +49,10 @@ public class TransactionService {
         Account account = accountService.debit(accountId, amount);
         Transaction debit = new Transaction(account, getToday(), transactionTypeRepository.findByName("DEBIT"), amount, account.getAvail_bal());
         return transactionRepository.save(debit);
+    }
+
+    public List<Transaction> getHistory(String accountId) {
+        List<Transaction> transactions = transactionRepository.findByAccount_id(accountId);
+        return  transactions;
     }
 }

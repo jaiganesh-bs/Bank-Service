@@ -1,7 +1,10 @@
 package com.bank.service;
 
+import com.bank.controller.response.TransactionHistoryResponse;
+import com.bank.controller.response.TransactionResponse;
 import com.bank.exceptions.AccountNotFoundException;
 import com.bank.model.Account;
+import com.bank.model.Transaction;
 import com.bank.model.UserAccount;
 import com.bank.repo.AccountRepository;
 import lombok.AllArgsConstructor;
@@ -12,12 +15,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
 @Service
 public class AccountService implements UserDetailsService {
-    private final AccountRepository accountRepository;
+    private AccountRepository accountRepository;
+
+    private TransactionService transactionService;
 
     public Account create(String name, String password) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -57,7 +64,16 @@ public class AccountService implements UserDetailsService {
         return account;
     }
 
-    public void getTransactionHistory(String id) {
+    public TransactionHistoryResponse getTransactionHistory(String id) throws AccountNotFoundException {
+        List<Transaction> transactions = transactionService.getHistory(id);
+        Account account = getAccount(id);
+        List<TransactionResponse> transactionResponse = new ArrayList<>();
+        for (Transaction transaction : transactions) {
+            transactionResponse.add(new TransactionResponse(transaction.getId(),transaction.getDate(), transaction.getTransactionType().getName(), transaction.getAmount(), transaction.getBalance()));
+        }
+        TransactionHistoryResponse transactionHistoryResponse = new TransactionHistoryResponse(account.getId(), account.getName(), transactionResponse, account.getAvail_bal());
 
+
+        return transactionHistoryResponse;
     }
 }

@@ -32,7 +32,7 @@ public class AccountController {
         return new ResponseEntity<>(summaryResponse, HttpStatus.OK);
     }
 
-    public void transactionHistory(Principal principal) {
+    public void transactionHistory(Principal principal) throws AccountNotFoundException {
         accountService.getTransactionHistory(principal.getName());
     }
 }

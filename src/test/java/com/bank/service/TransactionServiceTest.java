@@ -100,4 +100,13 @@ public class TransactionServiceTest {
 
         assertThrows(InvalidAmountException.class, () -> transactionService.debit(id, amount));
     }
+
+    @Test
+    void shouldBeAbleToGetTransactionHistoryOfAccountWhenAccountIdIsGiven() {
+        String accountId = "userId";
+
+        transactionService.getHistory(accountId);
+
+        verify(transactionRepository).findByAccount_id(accountId);
+    }
 }
