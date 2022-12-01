@@ -1,8 +1,7 @@
 package com.bank.controller.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import com.bank.model.Transaction;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -13,6 +12,8 @@ import java.util.Objects;
 @AllArgsConstructor
 @Setter
 @Getter
+@Builder
+@NoArgsConstructor
 public class TransactionResponse {
     private long transactionId;
 
@@ -22,7 +23,7 @@ public class TransactionResponse {
 
     private BigDecimal amount;
 
-    private BigDecimal balance;
+    private BigDecimal accountBalance;
 
     @Override
     public boolean equals(Object o) {
@@ -42,15 +43,13 @@ public class TransactionResponse {
         return dateFormat.format(date);
     }
 
-    @Override
-    public String toString() {
-        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        return '{' +
-                "transactionId=" + transactionId +
-                ", date=" + dateFormat.format(date) +
-                ", transactionType='" + transactionType + '\'' +
-                ", amount=" + amount +
-                ", balance=" + balance +
-                '}';
+    public TransactionResponse getTransactionResponse(Transaction transaction) {
+        return TransactionResponse.builder()
+                .transactionId(transaction.getId())
+                .date(transaction.getDate())
+                .transactionType(transaction.getTransactionType().name())
+                .amount(transaction.getAmount())
+                .accountBalance(transaction.getAccountBalance())
+                .build();
     }
 }

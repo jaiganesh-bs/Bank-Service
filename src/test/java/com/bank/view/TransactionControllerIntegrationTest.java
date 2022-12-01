@@ -6,11 +6,9 @@ import com.bank.controller.response.TransactionHistoryResponse;
 import com.bank.controller.response.TransactionResponse;
 import com.bank.model.Account;
 import com.bank.model.Transaction;
-import com.bank.model.TransactionType;
+import com.bank.model.constants.TransactionType;
 import com.bank.repo.AccountRepository;
 import com.bank.repo.TransactionRepository;
-import com.bank.repo.TransactionTypeRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,10 +28,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,38 +49,35 @@ public class TransactionControllerIntegrationTest {
     private TransactionRepository transactionRepository;
 
     @Autowired
-    private TransactionTypeRepository transactionTypeRepository;
-
-    @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
     private ObjectMapper objectMapper;
+    private String email;
+    private String password;
+    private Account account;
 
     @BeforeEach
     void beforeEach() {
         transactionRepository.deleteAll();
-        transactionTypeRepository.deleteAll();
         accountRepository.deleteAll();
+        email = "abc@example.com";
+        password = "Password@234";
+        account = new Account(email, bCryptPasswordEncoder.encode(password));
+        accountRepository.save(account);
     }
 
     @AfterEach
     void afterEach() {
         transactionRepository.deleteAll();
-        transactionTypeRepository.deleteAll();
         accountRepository.deleteAll();
     }
 
     @Test
     void shouldBeAbleToCreditAmountInAccount() throws Exception {
-        String name = "Jaiganesh";
-        String password = "Password@234";
-        Account account = new Account(name, bCryptPasswordEncoder.encode(password));
-        Account userAccount = accountRepository.save(account);
         TransactionRequest transactionRequest = new TransactionRequest(new BigDecimal(100));
-        transactionTypeRepository.save(new TransactionType("CREDIT"));
 
-        mockMvc.perform(post("/transaction/credit").with(httpBasic(userAccount.getId(), password))
+        mockMvc.perform(post("/transaction/credit").with(httpBasic(email, password))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transactionRequest)))
                 .andExpect(status().isCreated());
@@ -92,14 +86,9 @@ public class TransactionControllerIntegrationTest {
 
     @Test
     void shouldThrowErrorWhenAmountToBeCreditedIsLessThanOne() throws Exception {
-        String name = "Jaiganesh";
-        String password = "Password@234";
-        Account account = new Account(name, bCryptPasswordEncoder.encode(password));
-        Account userAccount = accountRepository.save(account);
         TransactionRequest transactionRequest = new TransactionRequest(new BigDecimal(0));
-        transactionTypeRepository.save(new TransactionType("CREDIT"));
 
-        mockMvc.perform(post("/transaction/credit").with(httpBasic(userAccount.getId(), password))
+        mockMvc.perform(post("/transaction/credit").with(httpBasic(email, password))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transactionRequest)))
                 .andExpect(status().isBadRequest());
@@ -107,14 +96,9 @@ public class TransactionControllerIntegrationTest {
 
     @Test
     void shouldBeAbleToDebitAmountInAccount() throws Exception {
-        String name = "Jaiganesh";
-        String password = "Password@234";
-        Account account = new Account(name, bCryptPasswordEncoder.encode(password));
-        Account userAccount = accountRepository.save(account);
         TransactionRequest transactionRequest = new TransactionRequest(new BigDecimal(100));
-        transactionTypeRepository.save(new TransactionType("DEBIT"));
 
-        mockMvc.perform(post("/transaction/debit").with(httpBasic(userAccount.getId(), password))
+        mockMvc.perform(post("/transaction/debit").with(httpBasic(email, password))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transactionRequest)))
                 .andExpect(status().isCreated());
@@ -123,14 +107,9 @@ public class TransactionControllerIntegrationTest {
 
     @Test
     void shouldThrowErrorWhenAmountToBeDebitedIsLessThanOne() throws Exception {
-        String name = "Jaiganesh";
-        String password = "Password@234";
-        Account account = new Account(name, bCryptPasswordEncoder.encode(password));
-        Account userAccount = accountRepository.save(account);
         TransactionRequest transactionRequest = new TransactionRequest(new BigDecimal(0));
-        transactionTypeRepository.save(new TransactionType("DEBIT"));
 
-        mockMvc.perform(post("/transaction/debit").with(httpBasic(userAccount.getId(), password))
+        mockMvc.perform(post("/transaction/debit").with(httpBasic(email, password))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transactionRequest)))
                 .andExpect(status().isBadRequest());
@@ -138,26 +117,20 @@ public class TransactionControllerIntegrationTest {
 
     @Test
     void shouldAbleToGetAccountTransactionHistory() throws Exception {
-        String name = "Jaiganesh";
-        String password = "Password@234";
-        Account account = new Account(name, bCryptPasswordEncoder.encode(password));
-        Account userAccount = accountRepository.save(account);
-        TransactionType debit = transactionTypeRepository.save(new TransactionType("DEBIT"));
-        TransactionType credit = transactionTypeRepository.save(new TransactionType("CREDIT"));
-
         BigDecimal amount = new BigDecimal(100);
-        Transaction firstTransaction = transactionRepository.save(new Transaction(userAccount, new Date(), credit, amount, amount));
-        Transaction secondTransaction = transactionRepository.save(new Transaction(userAccount, new Date(), debit, amount, account.getAvail_bal()));
+        Transaction firstTransaction = transactionRepository.save(new Transaction(account, new Date(), TransactionType.CREDIT, amount));
+        Transaction secondTransaction = transactionRepository.save(new Transaction(account, new Date(), TransactionType.DEBIT, amount));
         List<Transaction> transactions = new ArrayList<>(Arrays.asList(firstTransaction, secondTransaction));
-        ArrayList<TransactionResponse> transactionResponse = new ArrayList<TransactionResponse>();
+        ArrayList<TransactionResponse> transactionResponses = new ArrayList<>();
+        TransactionResponse transactionResponse = new TransactionResponse();
         for (Transaction transaction : transactions) {
-            transactionResponse.add(new TransactionResponse(transaction.getId(), transaction.getDate(), transaction.getTransactionType().getName(), transaction.getAmount(), transaction.getBalance()));
+            transactionResponses.add(transactionResponse.getTransactionResponse(transaction));
         }
-        TransactionHistoryResponse transactionHistoryResponse = new TransactionHistoryResponse(account.getId(), account.getName(), transactionResponse, account.getAvail_bal());
+        TransactionHistoryResponse transactionHistoryResponse = new TransactionHistoryResponse(account.getId(), account.getEmail(), account.getAvail_bal(), transactionResponses);
 
-        mockMvc.perform(get("/transaction").with(httpBasic(account.getId(), password)))
+        mockMvc.perform(get("/transaction").with(httpBasic(email, password)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(transactionHistoryResponse.toString()));
+                .andExpect(content().json(objectMapper.writeValueAsString(transactionHistoryResponse)));
 
     }
 }

@@ -6,14 +6,19 @@ import com.bank.exceptions.AccountNotFoundException;
 import com.bank.exceptions.InvalidAmountException;
 import com.bank.model.Account;
 import com.bank.model.Transaction;
-import com.bank.model.TransactionType;
+import com.bank.model.constants.TransactionType;
 import com.bank.repo.TransactionRepository;
-import com.bank.repo.TransactionTypeRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -21,121 +26,87 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class TransactionServiceTest {
-
+    @InjectMocks
     private TransactionService transactionService;
+    @Mock
     private TransactionRepository transactionRepository;
+    @Mock
     private AccountService accountService;
-    private TransactionTypeRepository transactionTypeRepository;
 
-    @BeforeEach
-    void setUp() {
-        transactionRepository = mock(TransactionRepository.class);
-        transactionTypeRepository = mock(TransactionTypeRepository.class);
-        accountService = mock(AccountService.class);
-        transactionService = new TransactionService(transactionRepository, accountService, transactionTypeRepository);
-    }
-
-    @Test
-    void shouldBeAbleToGetTheAccountAfterCreditedTheAmount() throws AccountNotFoundException, InvalidAmountException {
-        String id = "userId";
-        BigDecimal amount = new BigDecimal(100);
-        when(transactionTypeRepository.findByName("CREDIT")).thenReturn(new TransactionType("CREDIT"));
-        when(accountService.credit(id,amount)).thenReturn(mock(Account.class));
-
-        transactionService.credit(id, amount);
-
-        verify(accountService).credit(id, amount);
-    }
+    @Mock
+    private Account account;
 
     @Test
     void shouldBeAbleToAddTheTransactionToTheAccountWhenCreditIsDone() throws AccountNotFoundException, InvalidAmountException {
-        String accountId = "userId";
+        String email = "abc@example.com";
         BigDecimal amount = new BigDecimal(100);
-        when(transactionTypeRepository.findByName("CREDIT")).thenReturn(new TransactionType("CREDIT"));
-        Account account = mock(Account.class);
-        when(accountService.credit(accountId, amount)).thenReturn(account);
         Date today = new Date();
-        Transaction credit = new Transaction(account, today, transactionTypeRepository.findByName("CREDIT"), amount, account.getAvail_bal());
+        TransactionService spiedTransactionService = spy(transactionService);
+        when(spiedTransactionService.getCurrentDate()).thenReturn(today);
+        when(accountService.credit(email, amount)).thenReturn(account);
+        Transaction credit = new Transaction(account, today, TransactionType.CREDIT, amount);
 
-        transactionService.credit(accountId, amount);
+        spiedTransactionService.credit(email, amount);
 
         verify(transactionRepository).save(credit);
     }
 
     @Test
     void shouldThrowAmountNotBeLessThanOneExceptionWhenCreditAmountIsLessThanOne() {
-        String id = "userId";
+        String email = "abc@example.com";
         BigDecimal amount = new BigDecimal(-1);
 
-        assertThrows(InvalidAmountException.class, () -> transactionService.credit(id, amount));
-    }
-
-    @Test
-    void shouldBeAbleToGetAccountAfterTheAmountIsDebited() throws InvalidAmountException, AccountNotFoundException {
-        String id = "userId";
-        BigDecimal amount = new BigDecimal(100);
-        when(transactionTypeRepository.findByName("DEBIT")).thenReturn(new TransactionType("DEBIT"));
-        when(accountService.debit(id,amount)).thenReturn(mock(Account.class));
-
-        transactionService.debit(id, amount);
-
-        verify(accountService).debit(id, amount);
+        assertThrows(InvalidAmountException.class, () -> transactionService.credit(email, amount));
     }
 
     @Test
     void shouldBeAbleToAddTheTransactionToTheAccountWhenDebitIsDone() throws InvalidAmountException, AccountNotFoundException {
-        String accountId = "userId";
+        String email = "abc@example.com";
         BigDecimal amount = new BigDecimal(100);
-        when(transactionTypeRepository.findByName("DEBIT")).thenReturn(new TransactionType("DEBIT"));
-        Account account = mock(Account.class);
-        when(accountService.debit(accountId, amount)).thenReturn(account);
         Date today = new Date();
-        Transaction debit = new Transaction(account, today, transactionTypeRepository.findByName("CREDIT"), amount, account.getAvail_bal());
+        TransactionService spiedTransactionService = spy(transactionService);
+        when(spiedTransactionService.getCurrentDate()).thenReturn(today);
+        when(accountService.debit(email, amount)).thenReturn(account);
+        Transaction debit = new Transaction(account, today, TransactionType.DEBIT, amount);
 
-        transactionService.debit(accountId, amount);
+        spiedTransactionService.debit(email, amount);
 
         verify(transactionRepository).save(debit);
     }
 
     @Test
     void shouldThrowAmountNotBeLessThanOneExceptionWhenDebitAmountIsLessThanOne() {
-        String id = "userId";
+        String email = "abc@example.com";
         BigDecimal amount = new BigDecimal(-1);
 
-        assertThrows(InvalidAmountException.class, () -> transactionService.debit(id, amount));
-    }
-
-    @Test
-    void shouldBeAbleToGetTransactionHistoryOfAccountWhenAccountIdIsGiven() {
-        String accountId = "userId";
-
-        transactionService.getHistory(accountId);
-
-        verify(transactionRepository).findByAccount_id(accountId);
+        assertThrows(InvalidAmountException.class, () -> transactionService.debit(email, amount));
     }
 
     @Test
     void shouldAbleToGetAccountTransactionHistoryAndAvailableBalanceWhenAccountIdIsGiven() throws AccountNotFoundException {
         String id = "userAccount";
-        String name = "Jaiganesh";
+        String email = "Jaiganesh";
         String password = "Password@234";
         BigDecimal balance = new BigDecimal(0);
-        Account account = new Account(id, name, password, balance);
-        when(accountService.getAccount(id)).thenReturn(account);
+        Account account = new Account(id, email, password, balance);
+        when(accountService.getAccount(email)).thenReturn(account);
         BigDecimal amount = new BigDecimal(100);
-        Transaction credit = new Transaction(account, new Date(), new TransactionType("CREDIT"), amount, amount);
-        Transaction debit = new Transaction(account, new Date(), new TransactionType("DEBIT"), amount, balance);
+        Transaction credit = new Transaction(account, new Date(), TransactionType.CREDIT, amount);
+        Transaction debit = new Transaction(account, new Date(), TransactionType.DEBIT, amount);
         List<Transaction> transactions = new ArrayList<>(Arrays.asList(credit, debit));
-        when(transactionService.getHistory(id)).thenReturn(transactions);
-        ArrayList<TransactionResponse> transactionResponse = new ArrayList<TransactionResponse>();
+        when(transactionService.getHistory(email)).thenReturn(transactions);
+        ArrayList<TransactionResponse> transactionResponses = new ArrayList<>();
+        TransactionResponse transactionResponse = new TransactionResponse();
         for (Transaction transaction : transactions) {
-            transactionResponse.add(new TransactionResponse(transaction.getId(),transaction.getDate(), transaction.getTransactionType().getName(), transaction.getAmount(), transaction.getBalance()));
+            transactionResponses.add(transactionResponse.getTransactionResponse(transaction));
         }
-        TransactionHistoryResponse transactionHistoryResponse = new TransactionHistoryResponse(id, name, transactionResponse, balance);
+        TransactionHistoryResponse expectedTransactionHistoryResponse = new TransactionHistoryResponse(id, email, balance, transactionResponses);
 
-        TransactionHistoryResponse actualTransactionHistoryResponse = transactionService.getAccountStatement(id);
+        TransactionHistoryResponse actualTransactionHistoryResponse = transactionService.getAccountStatement(email);
 
-        assertThat(transactionHistoryResponse, is(equalTo(actualTransactionHistoryResponse)));
+        verify(transactionRepository).findByAccountEmail(email);
+        assertThat(actualTransactionHistoryResponse, is(equalTo(expectedTransactionHistoryResponse)));
     }
 }

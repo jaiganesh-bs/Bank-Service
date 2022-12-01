@@ -6,8 +6,8 @@ import com.bank.exceptions.AccountNotFoundException;
 import com.bank.exceptions.InvalidAmountException;
 import com.bank.model.Account;
 import com.bank.model.Transaction;
+import com.bank.model.constants.TransactionType;
 import com.bank.repo.TransactionRepository;
-import com.bank.repo.TransactionTypeRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,46 +27,49 @@ public class TransactionService {
     private TransactionRepository transactionRepository;
     @Autowired
     private AccountService accountService;
-    @Autowired
-    private TransactionTypeRepository transactionTypeRepository;
 
-    public Transaction credit(String accountId, BigDecimal amount) throws AccountNotFoundException, InvalidAmountException {
-        if(isValidAmount(amount)) throw new InvalidAmountException();
-        Account account = accountService.credit(accountId, amount);
-        Transaction credit = new Transaction(account, getToday(), transactionTypeRepository.findByName("CREDIT"), amount, account.getAvail_bal());
-        return transactionRepository.save(credit);
+
+    public void credit(String email, BigDecimal amount) throws AccountNotFoundException, InvalidAmountException {
+        if (isInValidAmount(amount)) throw new InvalidAmountException();
+        Account account = accountService.credit(email, amount);
+        Transaction credit = new Transaction(account, getCurrentDate(), TransactionType.CREDIT, amount);
+        transactionRepository.save(credit);
     }
 
-    private boolean isValidAmount(BigDecimal amount) {
-        return amount.signum() != 1;
+
+    private boolean isInValidAmount(BigDecimal amount) {
+        int valid = 1;
+        return amount.signum() != valid;
     }
 
-    private Date getToday() {
+    public Date getCurrentDate() {
         return new Date();
     }
 
-    public Transaction debit(String accountId, BigDecimal amount) throws InvalidAmountException, AccountNotFoundException {
-        if(isValidAmount(amount)) throw new InvalidAmountException();
+    public void debit(String accountId, BigDecimal amount) throws InvalidAmountException, AccountNotFoundException {
+        if (isInValidAmount(amount)) throw new InvalidAmountException();
         Account account = accountService.debit(accountId, amount);
-        Transaction debit = new Transaction(account, getToday(), transactionTypeRepository.findByName("DEBIT"), amount, account.getAvail_bal());
-        return transactionRepository.save(debit);
+        Transaction debit = new Transaction(account, getCurrentDate(), TransactionType.DEBIT, amount);
+        transactionRepository.save(debit);
     }
 
-    public List<Transaction> getHistory(String accountId) {
-        List<Transaction> transactions = transactionRepository.findByAccount_id(accountId);
-        return  transactions;
+    public List<Transaction> getHistory(String email) {
+        return transactionRepository.findByAccountEmail(email);
     }
 
-    public TransactionHistoryResponse getAccountStatement(String id) throws AccountNotFoundException {
-        List<Transaction> transactions = getHistory(id);
-        Account account = accountService.getAccount(id);
-        List<TransactionResponse> transactionResponse = new ArrayList<>();
+    public TransactionHistoryResponse getAccountStatement(String email) throws AccountNotFoundException {
+        List<Transaction> transactions = getHistory(email);
+        Account account = accountService.getAccount(email);
+        List<TransactionResponse> transactionResponses = getTransactionResponses(transactions);
+        return new TransactionHistoryResponse(account.getId(), account.getEmail(), account.getAvail_bal(), transactionResponses);
+    }
+
+    private List<TransactionResponse> getTransactionResponses(List<Transaction> transactions) {
+        List<TransactionResponse> transactionResponses = new ArrayList<>();
+        TransactionResponse transactionResponse = new TransactionResponse();
         for (Transaction transaction : transactions) {
-            transactionResponse.add(new TransactionResponse(transaction.getId(),transaction.getDate(), transaction.getTransactionType().getName(), transaction.getAmount(), transaction.getBalance()));
+            transactionResponses.add(transactionResponse.getTransactionResponse(transaction));
         }
-        TransactionHistoryResponse transactionHistoryResponse = new TransactionHistoryResponse(account.getId(), account.getName(), transactionResponse, account.getAvail_bal());
-
-
-        return transactionHistoryResponse;
+        return transactionResponses;
     }
 }

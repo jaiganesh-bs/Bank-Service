@@ -2,6 +2,7 @@ package com.bank.controller.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -11,11 +12,12 @@ import java.util.Objects;
 @AllArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
 public class TransactionHistoryResponse {
     private String accountNumber;
     private String name;
-    private List<TransactionResponse> transactions;
     private BigDecimal balance;
+    private List<TransactionResponse> transactions;
 
     @Override
     public boolean equals(Object o) {

@@ -1,82 +1,94 @@
 package com.bank.service;
 
-import com.bank.controller.response.TransactionHistoryResponse;
-import com.bank.controller.response.TransactionResponse;
+import com.bank.controller.request.CreateAccountRequest;
+import com.bank.controller.response.SummaryResponse;
 import com.bank.exceptions.AccountNotFoundException;
+import com.bank.exceptions.UserAlreadyExistException;
 import com.bank.model.Account;
-import com.bank.model.Transaction;
-import com.bank.model.TransactionType;
 import com.bank.repo.AccountRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class AccountServiceTest {
-
+    @Mock
     private AccountRepository accountRepository;
+    @InjectMocks
     private AccountService accountService;
 
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private TransactionService transactionService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
-    @BeforeEach
-    public void setUp() {
-        accountRepository = mock(AccountRepository.class);
-        bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        accountService = new AccountService(accountRepository);
+
+    @Test
+    void shouldBeAbleToCreateAccountWhenValidNameAndPasswordIsGiven() throws UserAlreadyExistException {
+        String email = "ac@example.com";
+        String password = "Password@234";
+        Account account = new Account(email, bCryptPasswordEncoder.encode(password));
+        CreateAccountRequest createAccountRequest = new CreateAccountRequest(email, password);
+
+        accountService.create(createAccountRequest);
+
+        verify(accountRepository).save(account);
     }
 
     @Test
-    void shouldBeAbleToCreateAccountWhenValidNameAndPasswordIsGiven() {
-        String name = "Jaiganesh";
+    void shouldThrowUserAlreadyExistExceptionWhenUserTriesToUseSameEmailToCreateAnAccount() {
+        String email = "ac@example.com";
         String password = "Password@234";
-        Account account = new Account(name, bCryptPasswordEncoder.encode(password));
-        when(accountRepository.save(account)).thenReturn(account);
+        Account account = new Account(email, bCryptPasswordEncoder.encode(password));
+        CreateAccountRequest createAccountRequest = new CreateAccountRequest(email, password);
+        when(accountRepository.findByEmail(email)).thenReturn(Optional.of(account));
 
-        Account actualAccount = accountService.create(name, password);
+        assertThrows(UserAlreadyExistException.class,()->accountService.create(createAccountRequest));
 
-        assertThat(account, is(equalTo(actualAccount)));
     }
 
     @Test
     void shouldBeAbleToGetAccountSummaryWhenValidAccountIdIsGiven() throws AccountNotFoundException {
-        String id = "userAccount";
-        String name = "Jaiganesh";
+        String email = "Jaiganesh";
         String password = "Password@234";
-        Account account = new Account(name, password);
-        when(accountRepository.findById(id)).thenReturn(Optional.of(account));
+        Account account = new Account(email, password);
+        when(accountRepository.findByEmail(email)).thenReturn(Optional.of(account));
+        SummaryResponse summaryResponse = new SummaryResponse();
+        SummaryResponse actualSummaryResponse = summaryResponse.getSummaryResponse(account);
 
-        Account userAccount = accountService.getAccount(id);
+        SummaryResponse expectedAccountSummary = accountService.getAccountSummary(email);
 
-        assertThat(account, is(equalTo(userAccount)));
+        assertThat(actualSummaryResponse, is(equalTo(expectedAccountSummary)));
     }
 
     @Test
     void shouldThrowAccountNotFoundExceptionWhenGivenIdIsNotValid() {
-        String id = "userAccount";
+        String email = "Jaiganesh";
 
-        assertThrows(AccountNotFoundException.class, () -> accountService.getAccount(id));
+        assertThrows(AccountNotFoundException.class, () -> accountService.getAccountSummary(email));
 
     }
 
     @Test
     void shouldReturnTenAsAvailableBalanceWhenTenRupeesIsCreditedToAccount() throws AccountNotFoundException {
         BigDecimal ten = new BigDecimal(10);
-        String id = "userAccount";
-        String name = "Jaiganesh";
+        String email = "abc@example.com";
         String password = "Password@234";
-        Account userAccount = new Account(name, password);
-        when(accountRepository.findById(id)).thenReturn(Optional.of(userAccount));
+        Account userAccount = new Account(email, password);
+        when(accountRepository.findByEmail(email)).thenReturn(Optional.of(userAccount));
 
-        Account account = accountService.credit(id, ten);
+        Account account = accountService.credit(email, ten);
 
         assertThat(ten, is(equalTo(account.getAvail_bal())));
     }
@@ -84,15 +96,17 @@ public class AccountServiceTest {
     @Test
     void shouldReturnTenAsAvailableBalanceWhenTenRupeesIsDebitedFromAccount() throws AccountNotFoundException {
         BigDecimal ten = new BigDecimal(10);
-        String id = "userAccount";
-        String name = "Jaiganesh";
+        BigDecimal twenty = new BigDecimal(20);
+        String email = "abc@example.com";
         String password = "Password@234";
-        Account userAccount = new Account(id, name, password, new BigDecimal(20));
-        when(accountRepository.findById(id)).thenReturn(Optional.of(userAccount));
+        Account userAccount = new Account(email, password);
+        userAccount.setAvail_bal(twenty);
+        when(accountRepository.findByEmail(email)).thenReturn(Optional.of(userAccount));
 
-        Account account = accountService.debit(id, ten);
+        Account account = accountService.debit(email, ten);
 
         assertThat(ten, is(equalTo(account.getAvail_bal())));
+        assertEquals(ten, account.getAvail_bal());
     }
 
 

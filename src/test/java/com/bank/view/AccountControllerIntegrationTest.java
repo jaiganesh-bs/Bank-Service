@@ -52,26 +52,41 @@ public class AccountControllerIntegrationTest {
 
     @Test
     void shouldBeAbleToCreateAccountWhenNameAndPasswordIsGiven() throws Exception {
-        String name = "Jaiganesh";
+        String email = "abc@example.com";
         String password = "Password@234";
-        CreateAccountRequest createAccountRequest = new CreateAccountRequest(name, password);
+        CreateAccountRequest createAccountRequest = new CreateAccountRequest(email, password);
 
         mockMvc.perform(post("/account")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createAccountRequest)))
                 .andExpect(status().isCreated());
     }
+    @Test
+    void shouldThrowUserAlreadyExistsErrorWhenUserTriesToCreateAnotherAccount() throws Exception {
+        String email = "abc@example.com";
+        String password = "Password@234";
+        Account account = new Account(email, bCryptPasswordEncoder.encode(password));
+        accountRepository.save(account);
+        CreateAccountRequest createAccountRequest = new CreateAccountRequest(email, password);
+
+        mockMvc.perform(post("/account")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createAccountRequest)))
+                .andExpect(status().isBadRequest());
+    }
 
     @Test
     void shouldBeAbleToGetAccountSummaryWhenValidAccountIdIsGiven() throws Exception {
-        String name = "Jaiganesh";
+        String email = "abc@example.com";
         String password = "Password@234";
-        Account account = new Account(name, bCryptPasswordEncoder.encode(password));
-        Account userAccount = accountRepository.save(account);
-        SummaryResponse summaryResponse = new SummaryResponse(userAccount.getId(), userAccount.getName(), userAccount.getAvail_bal());
+        Account account = new Account(email, bCryptPasswordEncoder.encode(password));
+        accountRepository.save(account);
+        SummaryResponse summaryResponse = new SummaryResponse();
+        SummaryResponse expectedSummaryResponse = summaryResponse.getSummaryResponse(account);
 
-        mockMvc.perform(get("/account/summary").with(httpBasic(userAccount.getId(), password)))
+        mockMvc.perform(get("/account/summary")
+                        .with(httpBasic(email, password)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(summaryResponse.toString()));
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedSummaryResponse)));
     }
 }

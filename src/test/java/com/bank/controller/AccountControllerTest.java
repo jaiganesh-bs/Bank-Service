@@ -1,51 +1,53 @@
 package com.bank.controller;
 
 import com.bank.controller.request.CreateAccountRequest;
+import com.bank.controller.response.SummaryResponse;
 import com.bank.exceptions.AccountNotFoundException;
-import com.bank.model.Account;
+import com.bank.exceptions.UserAlreadyExistException;
 import com.bank.service.AccountService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.security.Principal;
 
-import static org.mockito.Mockito.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class AccountControllerTest {
-
+    @Mock
     private AccountService accountService;
+    @InjectMocks
     private AccountController accountController;
+    @Mock
     private Principal principal;
 
 
-    @BeforeEach
-    public void setUp() {
-        accountService = mock(AccountService.class);
-        principal = mock(Principal.class);
-        accountController = new AccountController(accountService);
-    }
-
     @Test
-    void shouldBeAbleToCreateAccountWithValidNameAndPassword() {
-        String name = "Jaiganesh";
-        String password = "Password@234";
-        CreateAccountRequest createAccountRequest = new CreateAccountRequest(name, password);
-        when(accountService.create(createAccountRequest.getName(), createAccountRequest.getPassword())).thenReturn(new Account());
+    void shouldBeAbleToCreateAccountWithValidNameAndPassword() throws UserAlreadyExistException {
+        String email = "abc@example.com";
+        String password = "password";
+        CreateAccountRequest createAccountRequest = new CreateAccountRequest(email, password);
 
         accountController.create(createAccountRequest);
 
-        verify(accountService).create(createAccountRequest.getName(), createAccountRequest.getPassword());
+        verify(accountService).create(createAccountRequest);
     }
 
     @Test
     void shouldBeAbleToGetAccountSummary() throws AccountNotFoundException {
-        String id = "accountUser";
-        when(principal.getName()).thenReturn(id);
-        when(accountService.getAccount(id)).thenReturn(new Account());
+        SummaryResponse expectedSummaryResponse = new SummaryResponse();
+        when(accountService.getAccountSummary(principal.getName())).thenReturn(expectedSummaryResponse);
 
-        accountController.summary(principal);
+        SummaryResponse actualSummaryResponse = accountController.summary(principal);
 
-        verify(accountService).getAccount(id);
+        verify(accountService).getAccountSummary(principal.getName());
+        assertThat(actualSummaryResponse, is(expectedSummaryResponse));
     }
 
 

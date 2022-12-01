@@ -4,13 +4,13 @@ import com.bank.controller.request.TransactionRequest;
 import com.bank.controller.response.TransactionHistoryResponse;
 import com.bank.exceptions.AccountNotFoundException;
 import com.bank.exceptions.InvalidAmountException;
-import com.bank.model.Transaction;
 import com.bank.service.TransactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.security.Principal;
 
 @RestController
@@ -21,18 +21,19 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @PostMapping(value = "credit")
-    public ResponseEntity credit(Principal principal, @RequestBody TransactionRequest transactionRequest) throws AccountNotFoundException, InvalidAmountException {
-        Transaction credit = transactionService.credit(principal.getName(), transactionRequest.getAmount());
-        return new ResponseEntity(credit.getId(),HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public void credit(Principal principal,@RequestBody TransactionRequest transactionRequest) throws AccountNotFoundException, InvalidAmountException {
+        transactionService.credit(principal.getName(), transactionRequest.getAmount());
     }
+
     @PostMapping(value = "debit")
-    public ResponseEntity debit(Principal principal,@RequestBody TransactionRequest transactionRequest) throws InvalidAmountException, AccountNotFoundException {
-        Transaction debit = transactionService.debit(principal.getName(), transactionRequest.getAmount());
-        return new ResponseEntity(debit.getId(),HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public void debit(Principal principal, @RequestBody TransactionRequest transactionRequest) throws InvalidAmountException, AccountNotFoundException {
+        transactionService.debit(principal.getName(), transactionRequest.getAmount());
     }
+
     @GetMapping
-    public ResponseEntity accountStatement(Principal principal) throws AccountNotFoundException {
-        TransactionHistoryResponse transactionHistory = transactionService.getAccountStatement(principal.getName());
-        return new ResponseEntity(transactionHistory, HttpStatus.OK);
+    public TransactionHistoryResponse accountStatement(Principal principal) throws AccountNotFoundException {
+        return transactionService.getAccountStatement(principal.getName());
     }
 }
